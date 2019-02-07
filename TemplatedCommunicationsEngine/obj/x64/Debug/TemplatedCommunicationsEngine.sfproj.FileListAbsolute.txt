@@ -1,1 +1,2 @@
 C:\Users\zebco\source\repos\TemplatedCommunicationsEngine\TemplatedCommunicationsEngine\obj\x64\Debug\TemplatedCommunicationsEngine.sfproj.CoreCompileInputs.cache
+G:\repositories\Service_Fabric_Email_Templating_Engine\TemplatedCommunicationsEngine\obj\x64\Debug\TemplatedCommunicationsEngine.sfproj.CoreCompileInputs.cache
