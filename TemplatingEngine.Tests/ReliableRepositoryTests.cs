@@ -15,7 +15,7 @@ namespace TemplatingEngine.Tests
     [TestClass]
     public class ReliableRepositoryTests
     {
-        private Dictionary<long, IModel> _dictionary = new Dictionary<long, IModel>();
+        private readonly Dictionary<long, IModel> _dictionary = new Dictionary<long, IModel>();
         private ReliableRepositoryAsync<IModel> _repo;
         private Mock<IModel> _mockModel;
 
@@ -32,10 +32,7 @@ namespace TemplatingEngine.Tests
                 .Returns(Task.Delay(0));
 
             mockReliableDict.Setup(x => x.TryRemoveAsync(mockTransaction.Object, It.IsAny<long>()))
-                .Callback((ITransaction tx, long id) =>
-                {
-                    _dictionary.Remove(id);
-                });
+                .Callback((ITransaction tx, long id) => { _dictionary.Remove(id); });
 
             mockReliableDict.Setup(x => x.SetAsync(mockTransaction.Object, It.IsAny<long>(), It.IsAny<IModel>()))
                 .Callback((ITransaction tx, long id, IModel value) => { _dictionary[id] = value; });
@@ -43,7 +40,8 @@ namespace TemplatingEngine.Tests
             var mockStateManager = new Mock<IReliableStateManager>();
 
             mockStateManager
-                .Setup(x => x.GetOrAddAsync<IReliableDictionary<long, IModel>>(Settings.Constants.ReliableDictionaryNames.TemplatingEngineReliableDictionaryName))
+                .Setup(x => x.GetOrAddAsync<IReliableDictionary<long, IModel>>(Settings.Constants
+                    .ReliableDictionaryNames.TemplatingEngineReliableDictionaryName))
                 .Returns(Task.Run(() => mockReliableDict.Object));
 
             mockStateManager
@@ -51,7 +49,6 @@ namespace TemplatingEngine.Tests
                 .Returns(mockTransaction.Object);
 
             _repo = new ReliableRepositoryAsync<IModel>(mockStateManager.Object);
-
         }
 
         [TestCleanup]
@@ -61,7 +58,6 @@ namespace TemplatingEngine.Tests
         [TestMethod]
         public void Can_Instantiate()
             => Assert.IsNotNull(_repo);
-
 
         [TestMethod]
         public void Can_Create_Items()
@@ -104,10 +100,11 @@ namespace TemplatingEngine.Tests
         [TestMethod]
         public void Can_Update_Items()
         {
+            const string originalContent = "hello world";
+            const string newContent = "hello { Name }";
+
             _dictionary.Add(0, _mockModel.Object);
             _dictionary.Add(1, _mockModel.Object);
-            var originalContent = "hello world";
-            var newContent = "hello { Name }";
 
             _dictionary.Add(2, new CommunicationsTemplateModel()
             {
@@ -118,7 +115,7 @@ namespace TemplatingEngine.Tests
             {
                 Content = newContent
             });
-        
+
             while (task.IsCompleted == false)
                 Thread.SpinWait(5000);
 
@@ -128,8 +125,6 @@ namespace TemplatingEngine.Tests
             Assert.IsTrue(_dictionary.ContainsKey(2));
             Assert.IsNotNull(result);
             Assert.AreEqual(newContent, result.Content);
-
         }
-
     }
 }
