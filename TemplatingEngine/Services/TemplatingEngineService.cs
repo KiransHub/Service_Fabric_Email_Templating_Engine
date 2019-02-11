@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
@@ -18,14 +19,14 @@ namespace TemplatingEngine.Services
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class TemplatingEngine : StatefulService, ITemplatingEngineService, ITemplatingEngineContract
+    internal sealed class TemplatingEngineService : StatefulService, ITemplatingEngineService, ITemplatingEngineContract
     {
-        private ReliableRepositoryAsync<CommunicationsTemplateModel> _reliableRepository;
+        private readonly IReliableRepositoryAsync<CommunicationsTemplateModel> _reliableRepository;
 
-        public TemplatingEngine(StatefulServiceContext context)
+        public TemplatingEngineService(StatefulServiceContext context, IReliableRepositoryAsync<CommunicationsTemplateModel> reliableRepository)
             : base(context)
         {
-            _reliableRepository = new ReliableRepositoryAsync<CommunicationsTemplateModel>(StateManager);
+            _reliableRepository = reliableRepository;
         }
 
         /// <summary>
@@ -45,28 +46,23 @@ namespace TemplatingEngine.Services
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
-
+            var myDictionary = await StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
         }
 
-        public Task CreateCommunicationsTemplateAsync(CommunicationsTemplateModel templateModel)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<long> CreateTemplateAsync(CommunicationsTemplateModel templateModel)
+            => _reliableRepository.Create(templateModel);
+        
+        public Task<long> GetTemplateCount() 
+            => _reliableRepository.GetItemsCount();
 
-        public Task<IEnumerable<CommunicationsTemplateModel>> GetCommunicationsTemplatesAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public Task<IAsyncEnumerable<KeyValuePair<long, CommunicationsTemplateModel>>> GetTemplatesAsync()
+            => _reliableRepository.Read();
 
-        public Task DeleteCommunicationsTemplateByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public Task DeleteTemplateById(long templateId)
+            => _reliableRepository.Delete(templateId);
 
-        public Task EditCommunicationsTemplateAsync(int id, CommunicationsTemplateModel templateModel)
-        {
-            throw new NotImplementedException();
-        }
+        public Task UpdateTemplate(long templateId, CommunicationsTemplateModel templateModel)
+            => _reliableRepository.Update(templateId, templateModel);
+
     }
 }

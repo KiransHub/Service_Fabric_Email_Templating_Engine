@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace TemplatingEngine
 {
-    [EventSource(Name = "MyCompany-TemplatedCommunicationsEngine-TemplatingEngine")]
+    [EventSource(Name = "MyCompany-TemplatedCommunicationsEngine-TemplatingEngineService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
