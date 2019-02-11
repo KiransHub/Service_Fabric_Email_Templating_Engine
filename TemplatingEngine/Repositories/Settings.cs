@@ -2,9 +2,9 @@
 {
     internal class Settings
     {
-        public class Constants
+        internal class Constants
         {
-            public class ReliableDictionaryNames
+            internal class ReliableDictionaryNames
             {
                 public static string TemplatingEngineReliableDictionaryName { get; } = "TemplateEngineDictionary";
             }

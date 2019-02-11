@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TemplatingEngine.External.Models;
@@ -62,7 +60,7 @@ namespace TemplatingEngine.Tests
         [TestMethod]
         public void Can_Create_Items()
         {
-            var tempResult = _repo.CreateAsync(_mockModel.Object).Result;
+            var tempResult = _repo.Create(_mockModel.Object).Result;
             var count = _dictionary.Count;
 
             Assert.AreEqual(1, count);
@@ -106,7 +104,7 @@ namespace TemplatingEngine.Tests
             _dictionary.Add(0, _mockModel.Object);
             _dictionary.Add(1, _mockModel.Object);
 
-            _dictionary.Add(2, new CommunicationsTemplateModel()
+            _dictionary.Add(2, value: new CommunicationsTemplateModel()
             {
                 Content = originalContent
             });

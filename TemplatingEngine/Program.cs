@@ -1,11 +1,15 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Runtime;
+using TemplatingEngine.External.Models;
+using TemplatingEngine.Repositories;
+using TemplatingEngine.Services;
 
-
+[assembly: InternalsVisibleTo("TemplatingEngine.Tests")]
 namespace TemplatingEngine
 {
     internal static class Program
